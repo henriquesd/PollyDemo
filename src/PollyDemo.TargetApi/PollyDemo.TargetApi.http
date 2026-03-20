@@ -1,0 +1,6 @@
+@PollyDemo.TargetApi_HostAddress = http://localhost:5266
+
+GET {{PollyDemo.TargetApi_HostAddress}}/api/weather
+Accept: application/json
+
+###

@@ -1,0 +1,6 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/PollyDemo.ResilientApi/PollyDemo.ResilientApi.csproj" />
+    <Project Path="src/PollyDemo.TargetApi/PollyDemo.TargetApi.csproj" />
+  </Folder>
+</Solution>
