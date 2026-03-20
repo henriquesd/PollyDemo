@@ -16,7 +16,7 @@ public class WeatherController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> Get()
     {
-        var client = _httpClientFactory.CreateClient("TargetApi");
+        var client = _httpClientFactory.CreateClient("TargetApi-Exponential");
         var response = await client.GetAsync("/api/weather");
 
         if (response.IsSuccessStatusCode)
