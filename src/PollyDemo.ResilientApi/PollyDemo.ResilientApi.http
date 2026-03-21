@@ -1,4 +1,4 @@
-@PollyDemo.ResilientApi_HostAddress = http://localhost:5124
+@PollyDemo.ResilientApi_HostAddress = https://localhost:5002
 
 GET {{PollyDemo.ResilientApi_HostAddress}}/api/weather
 Accept: application/json
@@ -26,6 +26,11 @@ Accept: application/json
 ###
 
 GET {{PollyDemo.ResilientApi_HostAddress}}/api/retry/retry-after
+Accept: application/json
+
+###
+
+GET {{PollyDemo.ResilientApi_HostAddress}}/api/circuitbreaker/weather
 Accept: application/json
 
 ###

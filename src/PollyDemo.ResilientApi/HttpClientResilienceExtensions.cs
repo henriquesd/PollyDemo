@@ -126,4 +126,39 @@ public static class HttpClientResilienceExtensions
 
         return services;
     }
+
+    public static IServiceCollection AddCircuitBreakerClient(this IServiceCollection services, Uri baseAddress)
+    {
+        services.AddHttpClient("TargetApi-CircuitBreaker", client =>
+        {
+            client.BaseAddress = baseAddress;
+        })
+        .AddResilienceHandler("circuit-breaker", pipelineBuilder =>
+        {
+            pipelineBuilder.AddCircuitBreaker(new HttpCircuitBreakerStrategyOptions
+            {
+                FailureRatio = 0.5,
+                SamplingDuration = TimeSpan.FromSeconds(10),
+                MinimumThroughput = 3,
+                BreakDuration = TimeSpan.FromSeconds(5),
+                OnOpened = args =>
+                {
+                    Console.WriteLine($"Circuit OPENED. Break duration: {args.BreakDuration.TotalSeconds:F1}s");
+                    return default;
+                },
+                OnClosed = args =>
+                {
+                    Console.WriteLine("Circuit CLOSED. Requests flowing normally.");
+                    return default;
+                },
+                OnHalfOpened = args =>
+                {
+                    Console.WriteLine("Circuit HALF-OPENED. Testing with next request...");
+                    return default;
+                }
+            });
+        });
+
+        return services;
+    }
 }

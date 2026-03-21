@@ -18,7 +18,7 @@ public class RetryController : ControllerBase
     public async Task<IActionResult> GetWithConstantRetry()
     {
         var client = _httpClientFactory.CreateClient("TargetApi-Constant");
-        var response = await client.GetAsync("/api/weather");
+        var response = await client.GetAsync("/api/weather/slow");
 
         if (response.IsSuccessStatusCode)
         {
@@ -33,7 +33,7 @@ public class RetryController : ControllerBase
     public async Task<IActionResult> GetWithLinearRetry()
     {
         var client = _httpClientFactory.CreateClient("TargetApi-Linear");
-        var response = await client.GetAsync("/api/weather");
+        var response = await client.GetAsync("/api/weather/slow");
 
         if (response.IsSuccessStatusCode)
         {
@@ -48,7 +48,7 @@ public class RetryController : ControllerBase
     public async Task<IActionResult> GetWithExponentialRetry()
     {
         var client = _httpClientFactory.CreateClient("TargetApi-Exponential");
-        var response = await client.GetAsync("/api/weather");
+        var response = await client.GetAsync("/api/weather/slow");
 
         if (response.IsSuccessStatusCode)
         {
@@ -63,7 +63,7 @@ public class RetryController : ControllerBase
     public async Task<IActionResult> GetWithSelectiveRetry()
     {
         var client = _httpClientFactory.CreateClient("TargetApi-Selective");
-        var response = await client.GetAsync("/api/weather/slow");
+        var response = await client.GetAsync("/api/weather/mixed");
 
         if (response.IsSuccessStatusCode)
         {

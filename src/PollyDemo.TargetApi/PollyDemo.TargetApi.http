@@ -1,6 +1,26 @@
-@PollyDemo.TargetApi_HostAddress = http://localhost:5266
+@PollyDemo.TargetApi_HostAddress = https://localhost:5001
 
 GET {{PollyDemo.TargetApi_HostAddress}}/api/weather
+Accept: application/json
+
+###
+
+GET {{PollyDemo.TargetApi_HostAddress}}/api/weather/slow
+Accept: application/json
+
+###
+
+GET {{PollyDemo.TargetApi_HostAddress}}/api/weather/rate-limited
+Accept: application/json
+
+###
+
+GET {{PollyDemo.TargetApi_HostAddress}}/api/weather/mixed
+Accept: application/json
+
+###
+
+GET {{PollyDemo.TargetApi_HostAddress}}/api/weather/unstable
 Accept: application/json
 
 ###

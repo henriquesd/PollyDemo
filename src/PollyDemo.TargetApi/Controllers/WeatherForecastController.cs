@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 
 namespace PollyDemo.TargetApi.Controllers;
@@ -7,6 +8,7 @@ namespace PollyDemo.TargetApi.Controllers;
 public class WeatherController : ControllerBase
 {
     private static int _slowRequestCount;
+    private static readonly Stopwatch _unstableTimer = Stopwatch.StartNew();
 
     [HttpGet]
     public IActionResult Get()
@@ -43,5 +45,36 @@ public class WeatherController : ControllerBase
 
         Response.Headers["Retry-After"] = "2";
         return StatusCode(429, new { Message = "Too many requests" });
+    }
+
+    [HttpGet("mixed")]
+    public IActionResult GetMixed()
+    {
+        var roll = Random.Shared.Next(1, 4);
+
+        if (roll == 1)
+        {
+            return Ok(new { Temperature = 24, Summary = "Mild" });
+        }
+
+        if (roll == 2)
+        {
+            return StatusCode(503, new { Message = "Service unavailable" });
+        }
+
+        return StatusCode(500, new { Message = "Internal server error" });
+    }
+
+    [HttpGet("unstable")]
+    public IActionResult GetUnstable()
+    {
+        var secondsInCycle = _unstableTimer.Elapsed.TotalSeconds % 20;
+
+        if (secondsInCycle < 12)
+        {
+            return StatusCode(500, new { Message = "Service is down" });
+        }
+
+        return Ok(new { Temperature = 18, Summary = "Windy" });
     }
 }
