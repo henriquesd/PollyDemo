@@ -34,3 +34,18 @@ GET {{PollyDemo.ResilientApi_HostAddress}}/api/circuitbreaker/weather
 Accept: application/json
 
 ###
+
+GET {{PollyDemo.ResilientApi_HostAddress}}/api/timeout/weather
+Accept: application/json
+
+###
+
+GET {{PollyDemo.ResilientApi_HostAddress}}/api/fallback/weather
+Accept: application/json
+
+###
+
+GET {{PollyDemo.ResilientApi_HostAddress}}/api/timeout-fallback/weather
+Accept: application/json
+
+###

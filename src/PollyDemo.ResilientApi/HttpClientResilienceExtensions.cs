@@ -1,6 +1,8 @@
 using Microsoft.Extensions.Http.Resilience;
 using Polly;
+using Polly.Fallback;
 using Polly.Retry;
+using Polly.Timeout;
 using System.Net;
 
 namespace PollyDemo.ResilientApi;
@@ -154,6 +156,102 @@ public static class HttpClientResilienceExtensions
                 OnHalfOpened = args =>
                 {
                     Console.WriteLine("Circuit HALF-OPENED. Testing with next request...");
+                    return default;
+                }
+            });
+        });
+
+        return services;
+    }
+
+    public static IServiceCollection AddTimeoutClient(this IServiceCollection services, Uri baseAddress)
+    {
+        services.AddHttpClient("TargetApi-Timeout", client =>
+        {
+            client.BaseAddress = baseAddress;
+        })
+        .AddResilienceHandler("timeout", pipelineBuilder =>
+        {
+            pipelineBuilder.AddTimeout(new TimeoutStrategyOptions
+            {
+                Timeout = TimeSpan.FromSeconds(3),
+                OnTimeout = static args =>
+                {
+                    Console.WriteLine($"Request timed out after {args.Timeout.TotalSeconds:F1}s");
+                    return default;
+                }
+            });
+        });
+
+        return services;
+    }
+
+    public static IServiceCollection AddFallbackClient(this IServiceCollection services, Uri baseAddress)
+    {
+        services.AddHttpClient("TargetApi-Fallback", client =>
+        {
+            client.BaseAddress = baseAddress;
+        })
+        .AddResilienceHandler("fallback", pipelineBuilder =>
+        {
+            pipelineBuilder.AddFallback(new FallbackStrategyOptions<HttpResponseMessage>
+            {
+                ShouldHandle = static args => ValueTask.FromResult(
+                    args.Outcome.Exception is not null ||
+                    args.Outcome.Result?.IsSuccessStatusCode == false),
+                FallbackAction = static args =>
+                {
+                    var response = new HttpResponseMessage(System.Net.HttpStatusCode.OK)
+                    {
+                        Content = JsonContent.Create(new { Temperature = 0, Summary = "N/A (fallback)" })
+                    };
+                    return Outcome.FromResultAsValueTask(response);
+                },
+                OnFallback = static args =>
+                {
+                    Console.WriteLine($"Fallback triggered. Reason: {args.Outcome.Exception?.Message ?? args.Outcome.Result?.StatusCode.ToString()}");
+                    return default;
+                }
+            });
+        });
+
+        return services;
+    }
+
+    public static IServiceCollection AddTimeoutFallbackClient(this IServiceCollection services, Uri baseAddress)
+    {
+        services.AddHttpClient("TargetApi-TimeoutFallback", client =>
+        {
+            client.BaseAddress = baseAddress;
+        })
+        .AddResilienceHandler("timeout-fallback", pipelineBuilder =>
+        {
+            pipelineBuilder.AddFallback(new FallbackStrategyOptions<HttpResponseMessage>
+            {
+                ShouldHandle = static args => ValueTask.FromResult(
+                    args.Outcome.Exception is not null ||
+                    args.Outcome.Result?.IsSuccessStatusCode == false),
+                FallbackAction = static args =>
+                {
+                    var response = new HttpResponseMessage(System.Net.HttpStatusCode.OK)
+                    {
+                        Content = JsonContent.Create(new { Temperature = 0, Summary = "N/A (fallback)" })
+                    };
+                    return Outcome.FromResultAsValueTask(response);
+                },
+                OnFallback = static args =>
+                {
+                    Console.WriteLine($"Fallback triggered. Reason: {args.Outcome.Exception?.Message ?? args.Outcome.Result?.StatusCode.ToString()}");
+                    return default;
+                }
+            });
+
+            pipelineBuilder.AddTimeout(new TimeoutStrategyOptions
+            {
+                Timeout = TimeSpan.FromSeconds(3),
+                OnTimeout = static args =>
+                {
+                    Console.WriteLine($"Request timed out after {args.Timeout.TotalSeconds:F1}s");
                     return default;
                 }
             });

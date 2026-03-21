@@ -12,7 +12,10 @@ builder.Services
     .AddExponentialRetryClient(targetApiBaseAddress)
     .AddSelectiveRetryClient(targetApiBaseAddress)
     .AddRetryAfterClient(targetApiBaseAddress)
-    .AddCircuitBreakerClient(targetApiBaseAddress);
+    .AddCircuitBreakerClient(targetApiBaseAddress)
+    .AddTimeoutClient(targetApiBaseAddress)
+    .AddFallbackClient(targetApiBaseAddress)
+    .AddTimeoutFallbackClient(targetApiBaseAddress);
 
 var app = builder.Build();
 

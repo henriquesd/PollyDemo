@@ -77,4 +77,12 @@ public class WeatherController : ControllerBase
 
         return Ok(new { Temperature = 18, Summary = "Windy" });
     }
+
+    [HttpGet("delayed")]
+    public async Task<IActionResult> GetDelayed()
+    {
+        var delaySeconds = Random.Shared.Next(5, 11);
+        await Task.Delay(TimeSpan.FromSeconds(delaySeconds));
+        return Ok(new { Temperature = 15, Summary = "Rainy" });
+    }
 }
